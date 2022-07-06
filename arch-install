@@ -1,0 +1,11 @@
+#!/bin/sh
+
+pacman -Syy && pacman -Fyy
+pacman -Sqq wget sudo grub neofetch lynx man-db nano neovim tree htop speedtest-cli
+
+ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+hwclock --systohc
+
+sed -i "/#en_US.UTF-8 UTF-8/s/^#//g" /etc/locale.gen
+locale-gen
+echo -e "LANG=en_US.UTF-8" > /etc/locale.conf
