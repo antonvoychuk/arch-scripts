@@ -26,7 +26,7 @@ while test $# -gt 0; do
 done
 
 # Time zone
-if [$OPTS_SETUP_TIMEZONE -eq 1]; then
+if [ $OPTS_SETUP_TIMEZONE -eq 1 ]; then
 echo "Setting up time zone"
 # Set the time zone
 ln -sf /usr/share/zoneinfo/Europe/Madrid /etc/localtime
@@ -36,7 +36,7 @@ hwclock --systohc # This command assumes the hardware clock is set to UTC
 fi
 
 # Localization
-if [$OPTS_SETUP_LOCALE -eq 1]; then
+if [ $OPTS_SETUP_LOCALE -eq 1 ]; then
 echo "Setting up localization"
 # Edit /etc/locale.gen and uncomment en_US.UTF-8 UTF-8 and other needed locales
 sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
