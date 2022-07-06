@@ -1,11 +1,55 @@
 #!/bin/sh
 
-pacman -Syy && pacman -Fyy
-pacman -Sqq wget sudo grub neofetch lynx man-db nano neovim tree htop speedtest-cli
+OPTS_SETUP_TIMEZONE=0
+OPTS_SETUP_LOCALE=0
 
-ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
-hwclock --systohc
+while test $# -gt 0; do
+	case "$1" in
+		-h|--help)
+			echo "-h\t--help\n\tprint help\n"
+			echo "-t\t--timezone\n\tsetup the time zone\n"
+			echo "-l\t--locale\n\tsetup the localization\n"
+			exit 0;;
+		-t|--timezone)
+			OPTS_SETUP_TIMEZONE=1
+			shift;;
+		-l|--locale)
+			OPTS_SETUP_LOCALE=1
+			shift;;
+		-n|--netconf)
+			echo "network configuration";
+			shift;;
+		*)
+			echo "usage: $0 --help";
+			exit 0;;
+	esac
+done
 
-sed -i "/#en_US.UTF-8 UTF-8/s/^#//g" /etc/locale.gen
+# Time zone
+if [OPTS_SETUP_TIMEZONE -eq 1]; then
+echo "Setting up time zone"
+# Set the time zone
+ln -sf /usr/share/zoneinfo/Europe/Madrid /etc/localtime
+
+# Run hwclock to generate /etc/adjtime
+hwclock --systohc # This command assumes the hardware clock is set to UTC
+fi
+
+# Localization
+if [OPTS_SETUP_LOCALE -eq 1]; then
+echo "Setting up localization"
+# Edit /etc/locale.gen and uncomment en_US.UTF-8 UTF-8 and other needed locales
+sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
+sed -i '/#es_ES.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
+
+# Generate the locales
 locale-gen
-echo -e "LANG=en_US.UTF-8" > /etc/locale.conf
+
+# Create the locale.conf file, and set the LANG variable accordingly
+OPTS_PARAM_LANG="en_US.UTF8"
+echo -e "LANG=" > OPTS_PARAM_LANG > /etc/locale.conf
+
+# Set the console keyboard layout (optional)
+OPTS_PARAM_KEYMAP="xd"
+echo -e "KEYMAP=" > OPTS_PARAM_KEYMAP > /etc/vconsole.conf
+fi
